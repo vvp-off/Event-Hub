@@ -8,49 +8,60 @@
 import UIKit
 import SnapKit
 
+protocol ExploreViewControllerDelegate: AnyObject {
+    func openSeeAllVC()
+}
+
 final class ExploreViewController: UIViewController {
     
+    private enum Drawing {
+        static var topCollectionInset: CGFloat { 21.5 }
+    }
+    
     // MARK: - UI Elements
-    private let headerView: HeaderView
+    private let headerView = HeaderView()
+    private let upcomingCollectionView = ExploreCollectionView()
+    private let nearbyCollectionView = ExploreCollectionView()
     
     // MARK: - Public Properties
-    
-    // MARK: - Private Properties
-    private let model: ExploreModel
-    
-    // MARK: - Initializers
-    init() {
-        model = ExploreModel.getExploreModel()
-        headerView = HeaderView(model: model.header)
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        let model = ExploreModel.getExploreModel()
+        headerView.config(with: model.header)
+        upcomingCollectionView.config(with: model.upcomingEvents)
+        nearbyCollectionView.config(with: model.nearbyEvents)
     }
-    
-    // MARK: - Override Methods
-    
-    // MARK: - Actions
-    
-    // MARK: - Public Methods
-    
+
     // MARK: - Setup UI
     private func setupUI() {
         view.backgroundColor = .white
-        view.addSubview(headerView)
+        view.addSubviews(headerView, upcomingCollectionView, nearbyCollectionView)
         
+        upcomingCollectionView.delegate = self
+        upcomingCollectionView.collection.isScrollEnabled = true
+
         headerView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
         }
+        upcomingCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(headerView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+        }
+        nearbyCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(upcomingCollectionView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+        }
     }
-    
-    // MARK: - Private Methods
+}
+
+// MARK: - ExploreViewControllerDelegate
+extension ExploreViewController: ExploreViewControllerDelegate {
+    func openSeeAllVC() {
+        let tempVC = TempViewController()
+        present(tempVC, animated: true)
+    }
 }

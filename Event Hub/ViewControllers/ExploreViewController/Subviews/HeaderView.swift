@@ -54,11 +54,10 @@ final class HeaderView: UIView {
     // MARK: - Public Properties
     
     // MARK: - Private Properties
-    private let model: ExploreHeader
+    private var model: ExploreHeader?
     
     // MARK: - Initializers
-    init(model: ExploreHeader) {
-        self.model = model
+    init() {
         super.init(frame: .zero)
         setupUI()
     }
@@ -67,13 +66,16 @@ final class HeaderView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    // MARK: - View Life Cycles
     
     // MARK: - Override Methods
     
     // MARK: - Actions
     
     // MARK: - Public Methods
+    func config(with model: ExploreHeader) {
+        self.model = model
+        filterCollection.reloadData()
+    }
     
     // MARK: - Setup UI
     private func setupUI() {
@@ -106,7 +108,8 @@ extension HeaderView: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        model.filters.count
+        guard let model else { return 0 }
+        return model.filters.count
     }
     
     func collectionView(
@@ -117,7 +120,7 @@ extension HeaderView: UICollectionViewDataSource {
             withReuseIdentifier: FilterCollectionViewCell.identifier,
             for: indexPath
         ) as? FilterCollectionViewCell else { return UICollectionViewCell() }
-        guard model.filters.indices.contains(indexPath.row) else { return UICollectionViewCell() }
+        guard let model, model.filters.indices.contains(indexPath.row) else { return UICollectionViewCell() }
         let filterItem = model.filters[indexPath.row]
         cell.configure(with: filterItem)
         return cell
@@ -131,6 +134,7 @@ extension HeaderView: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
+        guard let model else { return CGSize(width: 0, height: 0) }
         let filterItem = model.filters[indexPath.row]
         let tempCell = FilterCollectionViewCell(frame: CGRect(x: 0, y: 0, width: 300, height: 39))
         tempCell.configure(with: filterItem)

@@ -26,11 +26,7 @@ final class FilterCollectionViewCell: UICollectionViewCell {
         color: .white,
         font: UIFont.airbnb(.book, size: 15)
     )
-    
-    // MARK: - Public Properties
-    
-    // MARK: - Private Properties
-    
+
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
