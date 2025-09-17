@@ -10,6 +10,8 @@ import UIKit
 
 class FavoritesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    let nm = NetworkManager()
+    var st = StorageManager.shared
     let tableView = UITableView(frame: .zero, style: .plain)
     var events: [Event] = []
     
@@ -17,10 +19,15 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
         super.viewDidLoad()
         title = "Favorites"
         view.backgroundColor = .systemGroupedBackground
-        
+    
         setupTableView()
         setupNavBar()
-        loadTestData()
+        st.loadEvents { [weak self] events in
+            print(events)
+            self?.events = events
+            self?.tableView.reloadData()
+        }
+ 
     }
     
     private func setupTableView() {
@@ -33,7 +40,7 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -58,18 +65,6 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
         navigationItem.searchController = searchController
     }
     
-    private func loadTestData() {
-        events = [
-            Event(date: "Wed, Apr 28", time: "5:30 PM",
-                  title: "Jo Malone London’s Mother’s Day Presents",
-                  location: "Radius Gallery · Santa Cruz, CA",
-                  imageName: "test foto", isFavorite: true),
-            Event(date: "Sat, May 1", time: "2:00 PM",
-                  title: "A Virtual Evening of Smooth Jazz",
-                  location: "Lot 13 · Oakland, CA",
-                  imageName: "test foto", isFavorite: false)
-        ]
-    }
     
     // MARK: - TableView
     
@@ -80,11 +75,7 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "EventCell", for: indexPath) as! EventCell
         let event = events[indexPath.row]
-        cell.dateLabel.text = "\(event.date) · \(event.time)"
-        cell.titleLabel.text = event.title
-        cell.locationLabel.text = event.location
-        cell.eventImageView.image = UIImage(named: event.imageName)
-        cell.favoriteButton.setImage(UIImage(systemName: event.isFavorite ? "bookmark.fill" : "bookmark"), for: .normal)
+        cell.configure(with: event)
         return cell
     }
 }

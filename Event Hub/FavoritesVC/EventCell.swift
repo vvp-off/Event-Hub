@@ -101,4 +101,23 @@ class EventCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func configure(with event: Event) {
+        titleLabel.text = event.title
+        dateLabel.text = event.dates.first?.formattedStartDate()
+        locationLabel.text = event.formattedLocation()
+        
+        // Настройка кнопки избранного
+        let isFavorite = event.isFavorite ?? false
+        favoriteButton.setImage(UIImage(systemName: isFavorite ? "bookmark.fill" : "bookmark"), for: .normal)
+        
+        // Загрузка изображения
+        if let imageUrl = event.images.first?.image {
+            NetworkManager().fetchImage(from: imageUrl) { [weak self] image in
+                DispatchQueue.main.async {
+                    self?.eventImageView.image = image
+                }
+            }
+        }
+    }
 }
