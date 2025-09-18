@@ -20,7 +20,7 @@ final class StorageManager {
     func loadEvents(
         slug: String? = nil,
         upcomingOnly: Bool = true,
-        limit: Int = 10,
+        limit: Int = 1,
         completion: (([Event]) -> Void)? = nil
     ) {
         var collectedEvents: [Event] = []

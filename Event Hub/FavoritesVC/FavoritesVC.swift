@@ -78,4 +78,11 @@ class FavoritesViewController: UIViewController, UITableViewDataSource, UITableV
         cell.configure(with: event)
         return cell
     }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let event = events[indexPath.row]
+        let vc = EventDetailViewController(event: event)
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
